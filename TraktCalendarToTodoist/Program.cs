@@ -32,9 +32,18 @@ foreach(TraktShow show in shows)
     {
         Item calendarItem = new Item(show.Title)
         {
-            DueDate = new DueDate(show.PublishDate.DateTime)
+            DueDate = new DueDate(show.PublishDate.DateTime, false, _config.timezone)
         };
 
-        var test = await todoistFactory.CreateTask(manager, calendarItem);
+        calendarItem.Labels.Add("Trakt");
+
+        ComplexId task = await todoistFactory.CreateTask(manager, calendarItem);
+
+        if(!task.IsEmpty)
+        {
+            await manager.Reminders.AddAsync(new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 60 });
+
+            //await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 60 });
+        }
     }
 }

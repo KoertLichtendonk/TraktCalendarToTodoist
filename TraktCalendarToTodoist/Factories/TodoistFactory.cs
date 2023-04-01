@@ -27,9 +27,16 @@ namespace TraktCalendarToTodoist.Factories
             return response;
         }
 
-        public async Task<string> CreateTask(ITodoistClient client, Item task)
+        public async Task<ComplexId> CreateTask(ITodoistClient client, Item task)
         {
-            string response = _rateLimiter.ExecuteAsync(async client => await client.Items.AddAsync(task)).Result.PersistentId;
+            ComplexId response = _rateLimiter.ExecuteAsync(async client => await client.Items.AddAsync(task)).Result;
+
+            return response;
+        }
+
+        public async Task<ComplexId> CreateReminder(ITodoistClient client, Reminder reminder)
+        {
+            ComplexId response = _rateLimiter.ExecuteAsync(async client => await client.Reminders.AddAsync(reminder)).Result;
 
             return response;
         }
