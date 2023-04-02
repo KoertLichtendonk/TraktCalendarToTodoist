@@ -30,6 +30,11 @@ namespace TraktCalendarToTodoist.Helpers
                 var result = await action(_client);
                 return result;
             }
+            catch(AggregateException ex)
+            {
+                await Task.Delay(1000);//ex.RetryAfter.GetValueOrDefault(300) * 1000);
+                return await ExecuteAsync(action);
+            }
             finally
             {
                 _ = Task.Delay(_rateLimitInterval).ContinueWith(t => _rateLimiter.Release());

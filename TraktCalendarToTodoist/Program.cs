@@ -41,9 +41,9 @@ foreach(TraktShow show in shows)
 
         if(!task.IsEmpty)
         {
-            await manager.Reminders.AddAsync(new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 60 });
-
-            //await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 60 });
+            await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 15 });
+            await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 30 });
+            await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 60 });
         }
     }
 }
