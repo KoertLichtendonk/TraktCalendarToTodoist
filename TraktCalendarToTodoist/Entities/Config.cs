@@ -13,6 +13,7 @@ namespace TraktCalendarToTodoist.Entities
         public string traktRSS { get; set; }
         public string todoistAPI { get; set; }
         public string timezone { get; set; }
+        public int retryAfter { get; set; }
 
         public Config()
         {
@@ -20,6 +21,7 @@ namespace TraktCalendarToTodoist.Entities
             this.traktRSS = String.Empty;
             this.todoistAPI = String.Empty;
             this.timezone = "Europe/Amsterdam";
+            this.retryAfter = 900000;
         }
     }
 }

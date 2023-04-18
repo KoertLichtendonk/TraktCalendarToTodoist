@@ -1,5 +1,6 @@
 ﻿using QuickConfig;
 using System.Reflection;
+using System.Text.RegularExpressions;
 using Todoist.Net;
 using Todoist.Net.Models;
 using TraktCalendarToTodoist.Entities;
@@ -23,27 +24,38 @@ catch (Exception ex)
     throw;
 }
 
-TodoistFactory todoistFactory = new TodoistFactory(manager);
+TodoistFactory todoistFactory = new TodoistFactory(manager, _config);
 List<Item> tasks = await todoistFactory.GetTasks(manager);
 
 foreach(TraktShow show in shows)
 {
-    if(!tasks.Any(i => i.Content == show.Title))
+    Match match = Regex.Match(show.Title, @"\dx\d+");
+
+    if (tasks.Any(i => i.Content == show.Title))
     {
-        Item calendarItem = new Item(show.Title)
-        {
-            DueDate = new DueDate(show.PublishDate.DateTime, false, _config.timezone)
-        };
+        Console.WriteLine(String.Format("{0} bestaat al.", show.Title));
+        continue;
+    }    
+        
+    if (tasks.Any(i => i.Content.Contains(match.Value)))
+    {
+        Console.WriteLine(String.Format("{0} bestaat al als aflevering {1}.", show.Title, match.Value));
+        continue;
+    }
 
-        calendarItem.Labels.Add("Trakt");
+    Item calendarItem = new Item(show.Title)
+    {
+        DueDate = new DueDate(show.PublishDate.DateTime, false, _config.timezone)
+    };
 
-        ComplexId task = await todoistFactory.CreateTask(manager, calendarItem);
+    calendarItem.Labels.Add("Trakt");
 
-        if(!task.IsEmpty)
-        {
-            await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 15 });
-            await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 30 });
-            await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 60 });
-        }
+    ComplexId task = await todoistFactory.CreateTask(manager, calendarItem);
+
+    if(!task.IsEmpty)
+    {
+        await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 15 });
+        await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 30 });
+        await todoistFactory.CreateReminder(manager, new Reminder(task) { Type = ReminderType.Relative, MinuteOffset = 60 });
     }
 }
